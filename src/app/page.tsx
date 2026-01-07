@@ -172,6 +172,13 @@ export default function Home() {
       const audioBlob = await ttsResponse.blob();
       const url = URL.createObjectURL(audioBlob);
       setAudioUrl(url);
+
+      // Auto-play the audio
+      const audio = new Audio(url);
+      audio.play().catch((error) => {
+        console.error('Auto-play failed:', error);
+        // Auto-play might be blocked by browser, that's okay
+      });
     } catch (error) {
       console.error('TTS error:', error);
       // Don't throw - audio is optional
