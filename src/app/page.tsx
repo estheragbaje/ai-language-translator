@@ -227,25 +227,68 @@ export default function Home() {
   const selectedLang = ALL_LANGUAGES[targetLanguage[0]] || ALL_LANGUAGES.fr;
 
   return (
-    <Box minH="100vh" bg="bg.subtle">
-      <Container maxW="container.xl" py={8}>
-        <VStack gap={8} align="stretch">
+    <Box minH="100vh" bg="gray.50" _dark={{ bg: 'gray.900' }}>
+      <Container maxW="6xl" py={{ base: 6, md: 10 }}>
+        <VStack gap={{ base: 6, md: 8 }} align="stretch">
           {/* Header */}
-          <VStack gap={2} textAlign="center">
-            <Heading size="4xl" fontWeight="bold">
-              🌍 AI Voice Translator
+          <VStack gap={3} textAlign="center">
+            <Box
+              px={6}
+              py={2}
+              bg="blue.50"
+              _dark={{ bg: 'blue.900/20' }}
+              borderRadius="full"
+              display="inline-block"
+            >
+              <Text
+                fontSize="sm"
+                fontWeight="medium"
+                color="blue.600"
+                _dark={{ color: 'blue.300' }}
+              >
+                AI-Powered Translation
+              </Text>
+            </Box>
+            <Heading
+              size={{ base: '2xl', md: '4xl' }}
+              fontWeight="extrabold"
+              letterSpacing="tight"
+              bgGradient="to-r"
+              gradientFrom="blue.500"
+              gradientTo="purple.500"
+              bgClip="text"
+            >
+              Real-Time Voice Translator
             </Heading>
-            <Text fontSize="lg" color="fg.muted">
-              Translate between English, French, Spanish, Yoruba, and
-              Kinyarwanda in real-time
+            <Text
+              fontSize={{ base: 'lg', md: 'xl' }}
+              color="gray.600"
+              _dark={{ color: 'gray.400' }}
+              maxW="3xl"
+              fontWeight="medium"
+            >
+              Speak naturally and get instant translations in multiple languages
             </Text>
           </VStack>
 
           {/* Language Selection */}
-          <HStack gap={4} justify="center" align="end" flexWrap="wrap">
+          <HStack
+            gap={4}
+            justify="center"
+            align="end"
+            flexWrap="wrap"
+            bg="white"
+            _dark={{ bg: 'gray.800' }}
+            p={6}
+            borderRadius="2xl"
+            shadow="sm"
+            borderWidth="1px"
+            borderColor="gray.200"
+            _dark={{ borderColor: 'gray.700' }}
+          >
             <Box
               flex={{ base: '1', md: 'initial' }}
-              minW={{ base: 'full', md: '200px' }}
+              minW={{ base: 'full', md: '240px' }}
             >
               <LanguageSelector
                 label="From"
@@ -256,17 +299,20 @@ export default function Home() {
               />
             </Box>
             <Button
-              size="sm"
+              size="lg"
               variant="ghost"
               onClick={swapLanguages}
               aria-label="Swap languages"
               mb={{ base: 0, md: 2 }}
+              fontSize="2xl"
+              colorPalette="blue"
+              _hover={{ bg: 'blue.50', _dark: { bg: 'blue.900/30' } }}
             >
               ⇄
             </Button>
             <Box
               flex={{ base: '1', md: 'initial' }}
-              minW={{ base: 'full', md: '200px' }}
+              minW={{ base: 'full', md: '240px' }}
             >
               <LanguageSelector
                 label="To"
@@ -278,53 +324,103 @@ export default function Home() {
           </HStack>
 
           {/* Input Method Tabs */}
-          <Tabs.Root defaultValue="voice" size="lg" variant="enclosed">
-            <Tabs.List>
-              <Tabs.Trigger value="voice">🎤 Voice</Tabs.Trigger>
-              <Tabs.Trigger value="text">⌨️ Text</Tabs.Trigger>
-            </Tabs.List>
-
-            {/* Voice Tab */}
-            <Tabs.Content value="voice">
-              <VStack gap={6} py={8} minH="200px">
-                <RecordButton
-                  state={state}
-                  duration={duration}
-                  onStart={startRecording}
-                  onStop={stopRecording}
-                />
-
-                <Text
-                  fontSize="sm"
-                  color="fg.muted"
-                  minH="20px"
-                  textAlign="center"
+          <Box
+            bg="white"
+            _dark={{ bg: 'gray.800' }}
+            borderRadius="2xl"
+            shadow="sm"
+            borderWidth="1px"
+            borderColor="gray.200"
+            _dark={{ borderColor: 'gray.700' }}
+            overflow="hidden"
+          >
+            <Tabs.Root defaultValue="voice" size="lg" variant="plain">
+              <Box px={3} pt={3}>
+                <Tabs.List
+                  bg="gray.100"
+                  _dark={{ bg: 'gray.900' }}
+                  borderRadius="lg"
+                  p={0.5}
+                  display="inline-flex"
+                  gap={0.5}
                 >
-                  {state === 'recording'
-                    ? '🎙️ Recording... Speak clearly into your microphone'
-                    : state === 'processing'
-                    ? '⚙️ Processing your recording...'
-                    : '\u00A0'}
-                </Text>
-              </VStack>
-            </Tabs.Content>
-
-            {/* Text Tab */}
-            <Tabs.Content value="text">
-              <Box py={8}>
-                <TextTranslationInput
-                  onTranslate={handleTranslateText}
-                  isTranslating={isTranslating}
-                  disabled={state === 'recording' || state === 'processing'}
-                />
+                  <Tabs.Trigger
+                    value="voice"
+                    px={3}
+                    py={1.5}
+                    borderRadius="md"
+                    fontWeight="semibold"
+                    fontSize="sm"
+                    _selected={{
+                      bg: 'white',
+                      _dark: { bg: 'gray.800' },
+                      shadow: 'sm',
+                    }}
+                  >
+                    🎤 Voice
+                  </Tabs.Trigger>
+                  <Tabs.Trigger
+                    value="text"
+                    px={3}
+                    py={1.5}
+                    borderRadius="md"
+                    fontWeight="semibold"
+                    fontSize="sm"
+                    _selected={{
+                      bg: 'white',
+                      _dark: { bg: 'gray.800' },
+                      shadow: 'sm',
+                    }}
+                  >
+                    ⌨️ Text
+                  </Tabs.Trigger>
+                </Tabs.List>
               </Box>
-            </Tabs.Content>
-          </Tabs.Root>
+
+              {/* Voice Tab */}
+              <Tabs.Content value="voice">
+                <VStack gap={3} py={4} px={3} minH="130px">
+                  <RecordButton
+                    state={state}
+                    duration={duration}
+                    onStart={startRecording}
+                    onStop={stopRecording}
+                  />
+
+                  <Text
+                    fontSize="sm"
+                    color="gray.600"
+                    _dark={{ color: 'gray.400' }}
+                    minH="20px"
+                    textAlign="center"
+                    fontWeight="medium"
+                  >
+                    {state === 'recording'
+                      ? '🎙️ Recording... Speak clearly into your microphone'
+                      : state === 'processing'
+                      ? '⚙️ Processing your recording...'
+                      : '\u00A0'}
+                  </Text>
+                </VStack>
+              </Tabs.Content>
+
+              {/* Text Tab */}
+              <Tabs.Content value="text">
+                <Box py={4} px={3}>
+                  <TextTranslationInput
+                    onTranslate={handleTranslateText}
+                    isTranslating={isTranslating}
+                    disabled={state === 'recording' || state === 'processing'}
+                  />
+                </Box>
+              </Tabs.Content>
+            </Tabs.Root>
+          </Box>
 
           {/* Transcripts */}
           <Grid
             templateColumns={{ base: '1fr', lg: '1fr 1fr' }}
-            gap={6}
+            gap={{ base: 4, md: 6 }}
             alignItems="stretch"
           >
             <GridItem display="flex">
@@ -359,23 +455,17 @@ export default function Home() {
           </Grid>
 
           {/* Footer */}
-          <VStack
-            gap={2}
-            pt={8}
-            borderTopWidth="1px"
-            borderColor="border.default"
-          >
-            <Text fontSize="sm" color="fg.muted" textAlign="center">
-              Powered by ElevenLabs & OpenAI • Built with Next.js & Chakra UI
+          <Box pt={{ base: 12, md: 16 }}>
+            <Text
+              fontSize="sm"
+              color="gray.500"
+              _dark={{ color: 'gray.500' }}
+              textAlign="center"
+              fontWeight="medium"
+            >
+              Powered by ElevenLabs & OpenAI
             </Text>
-            <HStack gap={4} fontSize="xs" color="fg.subtle">
-              <Text>🎤 Voice-first translation</Text>
-              <Text>•</Text>
-              <Text>⚡ Real-time processing</Text>
-              <Text>•</Text>
-              <Text>🌐 4 languages supported</Text>
-            </HStack>
-          </VStack>
+          </Box>
         </VStack>
       </Container>
 

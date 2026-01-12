@@ -1,6 +1,6 @@
 'use client';
 
-import { Button, Card, HStack, Text, VStack, Textarea } from '@chakra-ui/react';
+import { Button, HStack, Text, VStack, Textarea, Box } from '@chakra-ui/react';
 import { useState } from 'react';
 
 interface TextTranslationInputProps {
@@ -26,59 +26,81 @@ export function TextTranslationInput({
     setText('');
   };
 
+  const charCount = text.length;
+
   return (
-    <Card.Root variant="subtle" size="lg">
-      <Card.Header>
-        <HStack justify="space-between">
-          <VStack align="start" gap={0}>
-            <Text fontWeight="bold" fontSize="lg">
-              ✍️ Text Translation
-            </Text>
-            <Text fontSize="sm" color="fg.muted">
-              Type or paste text to translate
-            </Text>
-          </VStack>
-        </HStack>
-      </Card.Header>
-      <Card.Body>
-        <VStack gap={3} width="full">
-          <Textarea
-            value={text}
-            onChange={(e) => setText(e.target.value)}
-            placeholder="Enter text to translate..."
-            size="lg"
-            minHeight="120px"
-            disabled={disabled}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter' && e.metaKey) {
-                handleTranslate();
-              }
-            }}
-          />
-          <HStack width="full" justify="flex-end" gap={2}>
-            <Button
-              size="sm"
-              variant="ghost"
-              onClick={handleClear}
-              disabled={!text || disabled}
-            >
-              Clear
-            </Button>
-            <Button
-              size="sm"
-              colorPalette="blue"
-              onClick={handleTranslate}
-              disabled={!text.trim() || disabled}
-              loading={isTranslating}
-            >
-              Translate
-            </Button>
-          </HStack>
-          <Text fontSize="xs" color="fg.muted">
-            💡 Tip: Press Cmd+Enter to translate
+    <VStack gap={3} width="full" align="stretch">
+      <Box position="relative">
+        <Textarea
+          value={text}
+          onChange={(e) => setText(e.target.value)}
+          placeholder="Type or paste your text here..."
+          size="lg"
+          minHeight="100px"
+          disabled={disabled}
+          resize="vertical"
+          borderRadius="lg"
+          borderWidth="2px"
+          borderColor="gray.200"
+          _dark={{ borderColor: 'gray.700' }}
+          _hover={{
+            borderColor: 'blue.400',
+            _dark: { borderColor: 'blue.500' },
+          }}
+          _focus={{
+            borderColor: 'blue.500',
+            _dark: { borderColor: 'blue.400' },
+            boxShadow: '0 0 0 1px var(--chakra-colors-blue-500)',
+          }}
+          fontSize="md"
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) {
+              e.preventDefault();
+              handleTranslate();
+            }
+          }}
+        />
+        {charCount > 0 && (
+          <Text
+            position="absolute"
+            bottom={2}
+            right={3}
+            fontSize="xs"
+            color="gray.500"
+            _dark={{ color: 'gray.500' }}
+            pointerEvents="none"
+          >
+            {charCount} characters
           </Text>
-        </VStack>
-      </Card.Body>
-    </Card.Root>
+        )}
+      </Box>
+      
+      <HStack width="full" justify="space-between" align="center">
+        <Text fontSize="xs" color="gray.500" _dark={{ color: 'gray.500' }}>
+          Press Cmd/Ctrl + Enter to translate
+        </Text>
+        <HStack gap={2}>
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={handleClear}
+            disabled={!text || disabled}
+            colorPalette="gray"
+          >
+            Clear
+          </Button>
+          <Button
+            size="sm"
+            onClick={handleTranslate}
+            disabled={!text.trim() || disabled}
+            loading={isTranslating}
+            colorPalette="blue"
+            fontWeight="semibold"
+          >
+            {isTranslating ? 'Translating...' : 'Translate'}
+          </Button>
+        </HStack>
+      </HStack>
+    </VStack>
   );
 }
