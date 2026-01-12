@@ -1,6 +1,7 @@
 'use client';
 
-import { Box, Button, Card, HStack, Text, VStack } from '@chakra-ui/react';
+import { Box, Button, Card, HStack, Slider, Text, VStack } from '@chakra-ui/react';
+import { useRef, useState, useEffect } from 'react';
 
 interface TranscriptPanelProps {
   title: string;
@@ -12,6 +13,7 @@ interface TranscriptPanelProps {
   showPlay?: boolean;
   onCopy?: () => void;
   onPlay?: () => void;
+  audioUrl?: string | null;
   colorPalette?: 'blue' | 'green' | 'purple';
 }
 
@@ -25,10 +27,61 @@ export function TranscriptPanel({
   showPlay = false,
   onCopy,
   onPlay,
+  audioUrl,
   colorPalette = 'blue',
 }: TranscriptPanelProps) {
+  const audioRef = useRef<HTMLAudioElement>(null);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [currentTime, setCurrentTime] = useState(0);
+  const [duration, setDuration] = useState(0);
+
+  useEffect(() => {
+    const audio = audioRef.current;
+    if (!audio || !audioUrl) return;
+
+    const updateTime = () => setCurrentTime(audio.currentTime);
+    const updateDuration = () => setDuration(audio.duration);
+    const handleEnded = () => setIsPlaying(false);
+
+    audio.addEventListener('timeupdate', updateTime);
+    audio.addEventListener('durationchange', updateDuration);
+    audio.addEventListener('ended', handleEnded);
+
+    return () => {
+      audio.removeEventListener('timeupdate', updateTime);
+      audio.removeEventListener('durationchange', updateDuration);
+      audio.removeEventListener('ended', handleEnded);
+    };
+  }, [audioUrl]);
+
+  const togglePlayPause = () => {
+    const audio = audioRef.current;
+    if (!audio) return;
+
+    if (isPlaying) {
+      audio.pause();
+    } else {
+      audio.play();
+    }
+    setIsPlaying(!isPlaying);
+  };
+
+  const handleSeek = (details: { value: number[] }) => {
+    const audio = audioRef.current;
+    if (!audio) return;
+    audio.currentTime = details.value[0];
+    setCurrentTime(details.value[0]);
+  };
+
+  const formatTime = (seconds: number) => {
+    if (!isFinite(seconds)) return '0:00';
+    const mins = Math.floor(seconds / 60);
+    const secs = Math.floor(seconds % 60);
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
+  };
+
   return (
-    <Card.Root variant="outline" size="lg" colorPalette={colorPalette}>
+    <Card.Root variant="outline" size="lg" colorPalette={colorPalette} width="full" display="flex" flexDirection="column" height="full">
       <Card.Header>
         <HStack justify="space-between">
           <HStack gap={2}>
@@ -66,7 +119,7 @@ export function TranscriptPanel({
           </HStack>
         </HStack>
       </Card.Header>
-      <Card.Body>
+      <Card.Body flex="1" display="flex" flexDirection="column">
         {isLoading ? (
           <VStack gap={3} align="start" width="full">
             <Box height="4" bg="bg.muted" width="90%" borderRadius="md" />
@@ -88,6 +141,48 @@ export function TranscriptPanel({
               ? 'Press the microphone button to start recording...'
               : 'Translation will appear here...'}
           </Text>
+        )}
+
+        {/* Audio Player */}
+        {audioUrl && (
+          <VStack gap={4} width="full" mt={6} pt={6} borderTopWidth="1px" borderColor="border.subtle">
+            <audio ref={audioRef} src={audioUrl} preload="metadata" />
+
+            <HStack width="full" gap={3}>
+              <Button
+                size="md"
+                variant="solid"
+                onClick={togglePlayPause}
+                colorPalette={colorPalette}
+                minW="100px"
+              >
+                {isPlaying ? '⏸️ Pause' : '▶️ Play'}
+              </Button>
+
+              <VStack flex="1" gap={2} align="stretch">
+                <Slider.Root
+                  value={[currentTime]}
+                  onValueChange={handleSeek}
+                  min={0}
+                  max={duration || 100}
+                  step={0.1}
+                  colorPalette={colorPalette}
+                >
+                  <Slider.Control>
+                    <Slider.Track>
+                      <Slider.Range />
+                    </Slider.Track>
+                    <Slider.Thumb index={0} />
+                  </Slider.Control>
+                </Slider.Root>
+
+                <HStack justify="space-between" fontSize="xs" color="fg.muted">
+                  <Text>{formatTime(currentTime)}</Text>
+                  <Text>{formatTime(duration)}</Text>
+                </HStack>
+              </VStack>
+            </HStack>
+          </VStack>
         )}
       </Card.Body>
     </Card.Root>

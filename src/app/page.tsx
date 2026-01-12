@@ -9,6 +9,7 @@ import {
   GridItem,
   Heading,
   HStack,
+  Tabs,
   Text,
   VStack,
 } from '@chakra-ui/react';
@@ -276,27 +277,52 @@ export default function Home() {
             </Box>
           </HStack>
 
-          {/* Recording Controls */}
-          <VStack gap={6} py={8}>
-            <RecordButton
-              state={state}
-              duration={duration}
-              onStart={startRecording}
-              onStop={stopRecording}
-            />
+          {/* Input Method Tabs */}
+          <Tabs.Root defaultValue="voice" size="lg" variant="enclosed">
+            <Tabs.List>
+              <Tabs.Trigger value="voice">
+                🎤 Voice
+              </Tabs.Trigger>
+              <Tabs.Trigger value="text">
+                ⌨️ Text
+              </Tabs.Trigger>
+            </Tabs.List>
 
-            {state !== 'idle' && (
-              <Text fontSize="sm" color="fg.muted">
-                {state === 'recording'
-                  ? '🎙️ Recording... Speak clearly into your microphone'
-                  : '⚙️ Processing your recording...'}
-              </Text>
-            )}
-          </VStack>
+            {/* Voice Tab */}
+            <Tabs.Content value="voice">
+              <VStack gap={6} py={8} minH="200px">
+                <RecordButton
+                  state={state}
+                  duration={duration}
+                  onStart={startRecording}
+                  onStop={stopRecording}
+                />
+
+                <Text fontSize="sm" color="fg.muted" minH="20px" textAlign="center">
+                  {state === 'recording'
+                    ? '🎙️ Recording... Speak clearly into your microphone'
+                    : state === 'processing'
+                    ? '⚙️ Processing your recording...'
+                    : '\u00A0'}
+                </Text>
+              </VStack>
+            </Tabs.Content>
+
+            {/* Text Tab */}
+            <Tabs.Content value="text">
+              <Box py={8}>
+                <TextTranslationInput
+                  onTranslate={handleTranslateText}
+                  isTranslating={isTranslating}
+                  disabled={state === 'recording' || state === 'processing'}
+                />
+              </Box>
+            </Tabs.Content>
+          </Tabs.Root>
 
           {/* Transcripts */}
-          <Grid templateColumns={{ base: '1fr', lg: '1fr 1fr' }} gap={6}>
-            <GridItem>
+          <Grid templateColumns={{ base: '1fr', lg: '1fr 1fr' }} gap={6} alignItems="stretch">
+            <GridItem display="flex">
               <TranscriptPanel
                 title="Original"
                 text={sourceText}
@@ -310,7 +336,7 @@ export default function Home() {
                 colorPalette="blue"
               />
             </GridItem>
-            <GridItem>
+            <GridItem display="flex">
               <TranscriptPanel
                 title="Translation"
                 text={translatedText}
@@ -321,29 +347,11 @@ export default function Home() {
                 showPlay={true}
                 onCopy={() => handleCopyText(translatedText)}
                 onPlay={handlePlayAudio}
+                audioUrl={audioUrl}
                 colorPalette="green"
               />
             </GridItem>
           </Grid>
-
-          {/* Text Translation Alternative */}
-          <Box>
-            <TextTranslationInput
-              onTranslate={handleTranslateText}
-              isTranslating={isTranslating}
-              disabled={state === 'recording' || state === 'processing'}
-            />
-          </Box>
-
-          {/* Audio Player */}
-          {audioUrl && (
-            <AudioPlayer
-              audioUrl={audioUrl}
-              languageFlag={selectedLang.flag}
-              languageName={selectedLang.name}
-              onClose={() => setAudioUrl(null)}
-            />
-          )}
 
           {/* Footer */}
           <VStack
