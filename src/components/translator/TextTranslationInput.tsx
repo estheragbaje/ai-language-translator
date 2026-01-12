@@ -74,7 +74,7 @@ export function TextTranslationInput({
           </Text>
         )}
       </Box>
-      
+
       <HStack width="full" justify="space-between" align="center">
         <Text fontSize="xs" color="gray.500" _dark={{ color: 'gray.500' }}>
           Press Cmd/Ctrl + Enter to translate
