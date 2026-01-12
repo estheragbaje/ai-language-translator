@@ -272,9 +272,9 @@ export default function Home() {
             bg="white"
             _dark={{ bg: 'gray.800' }}
             borderRadius="2xl"
-            shadow="sm"
+            shadow="xs"
             borderWidth="1px"
-            borderColor="gray.200"
+            borderColor="gray.100"
             _dark={{ borderColor: 'gray.700' }}
             overflow="hidden"
           >
