@@ -253,10 +253,6 @@ export default function Home() {
               size={{ base: '2xl', md: '4xl' }}
               fontWeight="extrabold"
               letterSpacing="tight"
-              bgGradient="to-r"
-              gradientFrom="blue.500"
-              gradientTo="purple.500"
-              bgClip="text"
             >
               Real-Time Voice Translator
             </Heading>
@@ -271,59 +267,7 @@ export default function Home() {
             </Text>
           </VStack>
 
-          {/* Language Selection */}
-          <HStack
-            gap={4}
-            justify="center"
-            align="end"
-            flexWrap="wrap"
-            bg="white"
-            _dark={{ bg: 'gray.800' }}
-            p={6}
-            borderRadius="2xl"
-            shadow="sm"
-            borderWidth="1px"
-            borderColor="gray.200"
-            _dark={{ borderColor: 'gray.700' }}
-          >
-            <Box
-              flex={{ base: '1', md: 'initial' }}
-              minW={{ base: 'full', md: '240px' }}
-            >
-              <LanguageSelector
-                label="From"
-                value={sourceLanguage}
-                options={getAvailableSourceLanguages()}
-                onChange={setSourceLanguage}
-                disabled={false}
-              />
-            </Box>
-            <Button
-              size="lg"
-              variant="ghost"
-              onClick={swapLanguages}
-              aria-label="Swap languages"
-              mb={{ base: 0, md: 2 }}
-              fontSize="2xl"
-              colorPalette="blue"
-              _hover={{ bg: 'blue.50', _dark: { bg: 'blue.900/30' } }}
-            >
-              ⇄
-            </Button>
-            <Box
-              flex={{ base: '1', md: 'initial' }}
-              minW={{ base: 'full', md: '240px' }}
-            >
-              <LanguageSelector
-                label="To"
-                value={targetLanguage}
-                options={getAvailableTargetLanguages()}
-                onChange={setTargetLanguage}
-              />
-            </Box>
-          </HStack>
-
-          {/* Input Method Tabs */}
+          {/* Input Method Tabs with Language Selection */}
           <Box
             bg="white"
             _dark={{ bg: 'gray.800' }}
@@ -335,7 +279,15 @@ export default function Home() {
             overflow="hidden"
           >
             <Tabs.Root defaultValue="voice" size="lg" variant="plain">
-              <Box px={3} pt={3}>
+              <HStack
+                px={4}
+                pt={4}
+                pb={2}
+                justify="space-between"
+                align="center"
+                flexWrap="wrap"
+                gap={3}
+              >
                 <Tabs.List
                   bg="gray.100"
                   _dark={{ bg: 'gray.900' }}
@@ -375,7 +327,86 @@ export default function Home() {
                     ⌨️ Text
                   </Tabs.Trigger>
                 </Tabs.List>
-              </Box>
+
+                {/* Language Selection on the right */}
+                <HStack
+                  gap={2}
+                  align="center"
+                  display={{ base: 'none', md: 'flex' }}
+                >
+                  <Box minW="180px">
+                    <LanguageSelector
+                      label=""
+                      value={sourceLanguage}
+                      options={getAvailableSourceLanguages()}
+                      onChange={setSourceLanguage}
+                      disabled={false}
+                    />
+                  </Box>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    onClick={swapLanguages}
+                    aria-label="Swap languages"
+                    fontSize="lg"
+                    colorPalette="blue"
+                    px={2}
+                    minW="auto"
+                  >
+                    ⇄
+                  </Button>
+                  <Box minW="180px">
+                    <LanguageSelector
+                      label=""
+                      value={targetLanguage}
+                      options={getAvailableTargetLanguages()}
+                      onChange={setTargetLanguage}
+                    />
+                  </Box>
+                </HStack>
+              </HStack>
+
+              {/* Mobile language selection */}
+              <HStack
+                px={4}
+                pb={3}
+                gap={2}
+                justify="center"
+                display={{ base: 'flex', md: 'none' }}
+                flexWrap="wrap"
+              >
+                <Box flex="1" minW="140px">
+                  <LanguageSelector
+                    label=""
+                    value={sourceLanguage}
+                    options={getAvailableSourceLanguages()}
+                    onChange={setSourceLanguage}
+                    disabled={false}
+                  />
+                </Box>
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  onClick={swapLanguages}
+                  aria-label="Swap languages"
+                  fontSize="lg"
+                  colorPalette="blue"
+                  px={2}
+                  minW="auto"
+                  alignSelf="flex-end"
+                  mb={2}
+                >
+                  ⇄
+                </Button>
+                <Box flex="1" minW="140px">
+                  <LanguageSelector
+                    label=""
+                    value={targetLanguage}
+                    options={getAvailableTargetLanguages()}
+                    onChange={setTargetLanguage}
+                  />
+                </Box>
+              </HStack>
 
               {/* Voice Tab */}
               <Tabs.Content value="voice">
