@@ -1,6 +1,14 @@
 'use client';
 
-import { Box, Button, Card, HStack, Slider, Text, VStack } from '@chakra-ui/react';
+import {
+  Box,
+  Button,
+  Card,
+  HStack,
+  Slider,
+  Text,
+  VStack,
+} from '@chakra-ui/react';
 import { useRef, useState, useEffect } from 'react';
 
 interface TranscriptPanelProps {
@@ -81,7 +89,15 @@ export function TranscriptPanel({
   };
 
   return (
-    <Card.Root variant="outline" size="lg" colorPalette={colorPalette} width="full" display="flex" flexDirection="column" height="full">
+    <Card.Root
+      variant="outline"
+      size="lg"
+      colorPalette={colorPalette}
+      width="full"
+      display="flex"
+      flexDirection="column"
+      height="full"
+    >
       <Card.Header>
         <HStack justify="space-between">
           <HStack gap={2}>
@@ -145,7 +161,14 @@ export function TranscriptPanel({
 
         {/* Audio Player */}
         {audioUrl && (
-          <VStack gap={4} width="full" mt={6} pt={6} borderTopWidth="1px" borderColor="border.subtle">
+          <VStack
+            gap={4}
+            width="full"
+            mt={6}
+            pt={6}
+            borderTopWidth="1px"
+            borderColor="border.subtle"
+          >
             <audio ref={audioRef} src={audioUrl} preload="metadata" />
 
             <HStack width="full" gap={3}>

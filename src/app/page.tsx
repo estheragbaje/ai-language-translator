@@ -280,12 +280,8 @@ export default function Home() {
           {/* Input Method Tabs */}
           <Tabs.Root defaultValue="voice" size="lg" variant="enclosed">
             <Tabs.List>
-              <Tabs.Trigger value="voice">
-                🎤 Voice
-              </Tabs.Trigger>
-              <Tabs.Trigger value="text">
-                ⌨️ Text
-              </Tabs.Trigger>
+              <Tabs.Trigger value="voice">🎤 Voice</Tabs.Trigger>
+              <Tabs.Trigger value="text">⌨️ Text</Tabs.Trigger>
             </Tabs.List>
 
             {/* Voice Tab */}
@@ -298,7 +294,12 @@ export default function Home() {
                   onStop={stopRecording}
                 />
 
-                <Text fontSize="sm" color="fg.muted" minH="20px" textAlign="center">
+                <Text
+                  fontSize="sm"
+                  color="fg.muted"
+                  minH="20px"
+                  textAlign="center"
+                >
                   {state === 'recording'
                     ? '🎙️ Recording... Speak clearly into your microphone'
                     : state === 'processing'
@@ -321,7 +322,11 @@ export default function Home() {
           </Tabs.Root>
 
           {/* Transcripts */}
-          <Grid templateColumns={{ base: '1fr', lg: '1fr 1fr' }} gap={6} alignItems="stretch">
+          <Grid
+            templateColumns={{ base: '1fr', lg: '1fr 1fr' }}
+            gap={6}
+            alignItems="stretch"
+          >
             <GridItem display="flex">
               <TranscriptPanel
                 title="Original"
