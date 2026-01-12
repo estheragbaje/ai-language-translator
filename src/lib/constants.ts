@@ -1,12 +1,12 @@
 import { LanguageInfo, TargetLanguage } from '@/types/translator';
 
-export const SOURCE_LANGUAGE: LanguageInfo = {
-  code: 'en',
-  name: 'English',
-  flag: '🇺🇸',
-};
-
-export const TARGET_LANGUAGES: Record<TargetLanguage, LanguageInfo> = {
+export const ALL_LANGUAGES: Record<string, LanguageInfo> = {
+  en: {
+    code: 'en',
+    name: 'English',
+    flag: '🇺🇸',
+    voiceId: process.env.NEXT_PUBLIC_ELEVENLABS_VOICE_ID_EN,
+  },
   fr: {
     code: 'fr',
     name: 'French',
@@ -33,6 +33,16 @@ export const TARGET_LANGUAGES: Record<TargetLanguage, LanguageInfo> = {
   },
 };
 
+export const LANGUAGE_OPTIONS = Object.values(ALL_LANGUAGES);
+
+// Legacy exports for backward compatibility
+export const SOURCE_LANGUAGE = ALL_LANGUAGES.en;
+export const TARGET_LANGUAGES: Record<TargetLanguage, LanguageInfo> = {
+  fr: ALL_LANGUAGES.fr,
+  es: ALL_LANGUAGES.es,
+  yo: ALL_LANGUAGES.yo,
+  rw: ALL_LANGUAGES.rw,
+};
 export const TARGET_LANGUAGE_OPTIONS = Object.values(TARGET_LANGUAGES);
 
 export const MAX_RECORDING_DURATION = 60000; // 60 seconds

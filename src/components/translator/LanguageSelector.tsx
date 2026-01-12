@@ -33,6 +33,11 @@ export function LanguageSelector({
       disabled={disabled}
       size="lg"
       width="full"
+      positioning={{
+        strategy: 'fixed',
+        placement: 'bottom-start',
+        offset: { mainAxis: 4 },
+      }}
     >
       <Select.Label>{label}</Select.Label>
       <Select.Trigger>

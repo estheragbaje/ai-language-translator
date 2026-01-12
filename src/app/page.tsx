@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import {
   Box,
+  Button,
   Container,
   Grid,
   GridItem,
@@ -18,14 +19,10 @@ import { TranscriptPanel } from '@/components/translator/TranscriptPanel';
 import { TextTranslationInput } from '@/components/translator/TextTranslationInput';
 import { AudioPlayer } from '@/components/translator/AudioPlayer';
 import { useAudioRecorder } from '@/hooks/useAudioRecorder';
-import {
-  SOURCE_LANGUAGE,
-  TARGET_LANGUAGES,
-  TARGET_LANGUAGE_OPTIONS,
-} from '@/lib/constants';
-import { TargetLanguage } from '@/types/translator';
+import { ALL_LANGUAGES, LANGUAGE_OPTIONS } from '@/lib/constants';
 
 export default function Home() {
+  const [sourceLanguage, setSourceLanguage] = useState<string[]>(['en']);
   const [targetLanguage, setTargetLanguage] = useState<string[]>(['fr']);
   const [sourceText, setSourceText] = useState('');
   const [translatedText, setTranslatedText] = useState('');
@@ -51,21 +48,35 @@ export default function Home() {
       },
     });
 
-  const handleVoiceTranslation = async (audioBlob: Blob) => {
-    let loadingToast: any;
-    try {
-      loadingToast = toaster.loading({
-        title: 'Processing audio...',
-        description: 'Converting speech to text',
-      });
+  const swapLanguages = () => {
+    const temp = sourceLanguage;
+    setSourceLanguage(targetLanguage);
+    setTargetLanguage(temp);
+    // Clear translations when swapping
+    setSourceText('');
+    setTranslatedText('');
+  };
 
+  const getAvailableTargetLanguages = () => {
+    return LANGUAGE_OPTIONS.filter((lang) => lang.code !== sourceLanguage[0]);
+  };
+
+  const getAvailableSourceLanguages = () => {
+    return LANGUAGE_OPTIONS.filter((lang) => lang.code !== targetLanguage[0]);
+  };
+
+  const handleVoiceTranslation = async (audioBlob: Blob) => {
+    try {
       console.log('🎤 Starting STT with audio blob:', audioBlob.size, 'bytes');
 
       // Step 1: Convert speech to text
-      const sttResponse = await fetch('/api/stt/stream', {
-        method: 'POST',
-        body: audioBlob,
-      });
+      const sttResponse = await fetch(
+        `/api/stt/stream?language=${sourceLanguage[0]}`,
+        {
+          method: 'POST',
+          body: audioBlob,
+        }
+      );
 
       console.log('📡 STT Response status:', sttResponse.status);
 
@@ -88,11 +99,6 @@ export default function Home() {
 
       setSourceText(transcribedText);
 
-      // Dismiss the loading toast
-      if (loadingToast) {
-        toaster.dismiss(loadingToast.id);
-      }
-
       toaster.success({
         title: 'Transcription complete',
         description: transcribedText.substring(0, 50) + '...',
@@ -101,10 +107,6 @@ export default function Home() {
       // Step 2: Translate the text
       await handleTranslateText(transcribedText);
     } catch (error) {
-      // Dismiss the loading toast on error too
-      if (loadingToast) {
-        toaster.dismiss(loadingToast.id);
-      }
       console.error('❌ Voice translation error:', error);
       throw error;
     }
@@ -121,7 +123,7 @@ export default function Home() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           text,
-          source: 'en',
+          source: sourceLanguage[0],
           target: targetLanguage[0],
           style: 'formal',
         }),
@@ -140,7 +142,7 @@ export default function Home() {
       toaster.success({
         title: 'Translation complete',
         description: `Translated to ${
-          TARGET_LANGUAGES[targetLanguage[0] as TargetLanguage].name
+          ALL_LANGUAGES[targetLanguage[0]]?.name || 'Unknown'
         } in ${latencyMs}ms`,
       });
     } catch (error) {
@@ -221,9 +223,7 @@ export default function Home() {
     }
   };
 
-  const selectedLang =
-    TARGET_LANGUAGES[targetLanguage[0] as TargetLanguage] ||
-    TARGET_LANGUAGES.fr;
+  const selectedLang = ALL_LANGUAGES[targetLanguage[0]] || ALL_LANGUAGES.fr;
 
   return (
     <Box minH="100vh" bg="bg.subtle">
@@ -235,31 +235,46 @@ export default function Home() {
               🌍 AI Voice Translator
             </Heading>
             <Text fontSize="lg" color="fg.muted">
-              Translate English to French, Spanish, Yoruba, or Kinyarwanda in
-              real-time
+              Translate between English, French, Spanish, Yoruba, and
+              Kinyarwanda in real-time
             </Text>
           </VStack>
 
           {/* Language Selection */}
-          <Grid templateColumns={{ base: '1fr', md: '1fr 1fr' }} gap={6}>
-            <GridItem>
+          <HStack gap={4} justify="center" align="end" flexWrap="wrap">
+            <Box
+              flex={{ base: '1', md: 'initial' }}
+              minW={{ base: 'full', md: '200px' }}
+            >
               <LanguageSelector
                 label="From"
-                value={['en']}
-                options={[SOURCE_LANGUAGE]}
-                onChange={() => {}}
-                disabled
+                value={sourceLanguage}
+                options={getAvailableSourceLanguages()}
+                onChange={setSourceLanguage}
+                disabled={false}
               />
-            </GridItem>
-            <GridItem>
+            </Box>
+            <Button
+              size="sm"
+              variant="ghost"
+              onClick={swapLanguages}
+              aria-label="Swap languages"
+              mb={{ base: 0, md: 2 }}
+            >
+              ⇄
+            </Button>
+            <Box
+              flex={{ base: '1', md: 'initial' }}
+              minW={{ base: 'full', md: '200px' }}
+            >
               <LanguageSelector
                 label="To"
                 value={targetLanguage}
-                options={TARGET_LANGUAGE_OPTIONS}
+                options={getAvailableTargetLanguages()}
                 onChange={setTargetLanguage}
               />
-            </GridItem>
-          </Grid>
+            </Box>
+          </HStack>
 
           {/* Recording Controls */}
           <VStack gap={6} py={8}>
@@ -285,8 +300,10 @@ export default function Home() {
               <TranscriptPanel
                 title="Original"
                 text={sourceText}
-                languageFlag={SOURCE_LANGUAGE.flag}
-                languageName={SOURCE_LANGUAGE.name}
+                languageFlag={ALL_LANGUAGES[sourceLanguage[0]]?.flag || '🌐'}
+                languageName={
+                  ALL_LANGUAGES[sourceLanguage[0]]?.name || 'Unknown'
+                }
                 isLoading={state === 'processing' && !sourceText}
                 showCopy={true}
                 onCopy={() => handleCopyText(sourceText)}
