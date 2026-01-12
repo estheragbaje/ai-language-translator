@@ -1,6 +1,6 @@
 'use client';
 
-import { createListCollection, Select } from '@chakra-ui/react';
+import { createListCollection, Portal, Select } from '@chakra-ui/react';
 import { LanguageInfo } from '@/types/translator';
 
 interface LanguageSelectorProps {
@@ -43,15 +43,19 @@ export function LanguageSelector({
       <Select.Trigger>
         <Select.ValueText placeholder="Select language" />
       </Select.Trigger>
-      <Select.Content>
-        {options.map((lang) => (
-          <Select.Item key={lang.code} item={lang.code}>
-            <Select.ItemText>
-              {lang.flag} {lang.name}
-            </Select.ItemText>
-          </Select.Item>
-        ))}
-      </Select.Content>
+      <Portal>
+        <Select.Positioner>
+          <Select.Content>
+            {options.map((lang) => (
+              <Select.Item key={lang.code} item={lang.code}>
+                <Select.ItemText>
+                  {lang.flag} {lang.name}
+                </Select.ItemText>
+              </Select.Item>
+            ))}
+          </Select.Content>
+        </Select.Positioner>
+      </Portal>
     </Select.Root>
   );
 }
