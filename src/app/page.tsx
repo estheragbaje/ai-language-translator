@@ -493,7 +493,7 @@ export default function Home() {
               textAlign="center"
               fontWeight="medium"
             >
-              Powered by ElevenLabs, OpenAI & Chakra UI
+              Project powered by ElevenLabs, OpenAI & Chakra UI
             </Text>
           </Box>
         </VStack>
