@@ -267,7 +267,7 @@ export default function Home() {
             </Text>
           </VStack>
 
-          {/* Input Method Tabs with Language Selection */}
+          {/* Input Method Tabs with Language Selection. */}
           <Box
             bg="white"
             _dark={{ bg: 'gray.800', borderColor: 'gray.700' }}
