@@ -270,12 +270,11 @@ export default function Home() {
           {/* Input Method Tabs with Language Selection */}
           <Box
             bg="white"
-            _dark={{ bg: 'gray.800' }}
+            _dark={{ bg: 'gray.800', borderColor: 'gray.700' }}
             borderRadius="2xl"
             shadow="xs"
             borderWidth="1px"
             borderColor="gray.100"
-            _dark={{ borderColor: 'gray.700' }}
             overflow="hidden"
           >
             <Tabs.Root defaultValue="voice" size="lg" variant="plain">
