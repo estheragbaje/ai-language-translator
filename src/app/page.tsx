@@ -409,15 +409,23 @@ export default function Home() {
   };
 
   const handlePlayAudio = async () => {
-    if (audioUrl) {
-      // Audio already generated, just play it
-      return;
-    }
-
     if (!translatedText) {
       toaster.error({
         title: 'No translation',
         description: 'Please translate some text first',
+      });
+      return;
+    }
+
+    if (audioUrl) {
+      // Audio already exists, play it
+      const audio = new Audio(audioUrl);
+      audio.play().catch((error) => {
+        console.error('Play failed:', error);
+        toaster.error({
+          title: 'Playback failed',
+          description: 'Could not play audio',
+        });
       });
       return;
     }

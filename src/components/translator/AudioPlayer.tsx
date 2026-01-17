@@ -102,7 +102,7 @@ export function AudioPlayer({
           <HStack width="full" gap={3}>
             <Button
               size="lg"
-              variant="solid"
+              variant={isPlaying ? 'outline' : 'solid'}
               colorPalette="green"
               onClick={togglePlayPause}
               borderRadius="full"

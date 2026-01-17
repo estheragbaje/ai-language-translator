@@ -192,7 +192,7 @@ export function TranscriptPanel({
             <HStack width="full" gap={3}>
               <Button
                 size="md"
-                variant="solid"
+                variant={isPlaying ? 'outline' : 'solid'}
                 onClick={togglePlayPause}
                 colorPalette={colorPalette}
                 minW="100px"
