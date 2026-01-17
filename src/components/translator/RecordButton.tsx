@@ -59,9 +59,21 @@ export function RecordButton({
           transition="all 0.2s"
         >
           <VStack gap={1}>
-            <Text fontSize="2xl" fontWeight="medium">
-              {isRecording ? 'Stop' : 'Record'}
-            </Text>
+            {isRecording ? (
+              <>
+                <Box fontSize="2xl">⏹️</Box>
+                <Text fontSize="xs" fontWeight="medium">
+                  Stop
+                </Text>
+              </>
+            ) : (
+              <>
+                <Box fontSize="2xl">🎤</Box>
+                <Text fontSize="xs" fontWeight="medium">
+                  Record
+                </Text>
+              </>
+            )}
           </VStack>
         </Button>
       </Box>

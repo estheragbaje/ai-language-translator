@@ -145,7 +145,12 @@ export function BookmarksPanel({
               >
                 Cancel
               </Button>
-              <Button size="sm" colorPalette="blue" onClick={handleAddBookmark} borderRadius="md">
+              <Button
+                size="sm"
+                colorPalette="blue"
+                onClick={handleAddBookmark}
+                borderRadius="md"
+              >
                 Save
               </Button>
             </HStack>

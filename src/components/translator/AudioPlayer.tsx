@@ -84,7 +84,12 @@ export function AudioPlayer({
             </VStack>
           </HStack>
           {onClose && (
-            <Button size="sm" variant="ghost" onClick={onClose} borderRadius="md">
+            <Button
+              size="sm"
+              variant="ghost"
+              onClick={onClose}
+              borderRadius="md"
+            >
               ×
             </Button>
           )}
