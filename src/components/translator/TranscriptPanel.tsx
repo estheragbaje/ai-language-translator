@@ -122,8 +122,9 @@ export function TranscriptPanel({
                 variant="ghost"
                 onClick={onPlay}
                 colorPalette={colorPalette}
+                borderRadius="md"
               >
-                ▶️ Play
+                Play
               </Button>
             )}
             {showBookmark && onBookmark && text && (
@@ -133,8 +134,9 @@ export function TranscriptPanel({
                 onClick={onBookmark}
                 colorPalette="yellow"
                 title="Bookmark this translation"
+                borderRadius="md"
               >
-                ⭐ Bookmark
+                Bookmark
               </Button>
             )}
             {showCopy && onCopy && text && (
@@ -143,8 +145,9 @@ export function TranscriptPanel({
                 variant="ghost"
                 onClick={onCopy}
                 colorPalette={colorPalette}
+                borderRadius="md"
               >
-                📋 Copy
+                Copy
               </Button>
             )}
           </HStack>
@@ -193,8 +196,9 @@ export function TranscriptPanel({
                 onClick={togglePlayPause}
                 colorPalette={colorPalette}
                 minW="100px"
+                borderRadius="md"
               >
-                {isPlaying ? '⏸️ Pause' : '▶️ Play'}
+                {isPlaying ? 'Pause' : 'Play'}
               </Button>
 
               <VStack flex="1" gap={2} align="stretch">

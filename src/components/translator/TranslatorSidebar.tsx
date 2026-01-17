@@ -83,7 +83,7 @@ export function TranslatorSidebar({
                     shadow: 'sm',
                   }}
                 >
-                  📜 History
+                  History
                 </Tabs.Trigger>
                 <Tabs.Trigger
                   value="bookmarks"
@@ -96,7 +96,7 @@ export function TranslatorSidebar({
                     shadow: 'sm',
                   }}
                 >
-                  ⭐ Bookmarks
+                  Bookmarks
                 </Tabs.Trigger>
               </Tabs.List>
 

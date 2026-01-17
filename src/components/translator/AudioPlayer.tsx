@@ -84,8 +84,8 @@ export function AudioPlayer({
             </VStack>
           </HStack>
           {onClose && (
-            <Button size="sm" variant="ghost" onClick={onClose}>
-              ✕
+            <Button size="sm" variant="ghost" onClick={onClose} borderRadius="md">
+              ×
             </Button>
           )}
         </HStack>
@@ -102,7 +102,7 @@ export function AudioPlayer({
               onClick={togglePlayPause}
               borderRadius="full"
             >
-              {isPlaying ? '⏸️' : '▶️'}
+              {isPlaying ? 'Pause' : 'Play'}
             </Button>
 
             <VStack flex={1} gap={1}>

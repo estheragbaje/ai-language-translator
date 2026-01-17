@@ -86,6 +86,7 @@ export function TextTranslationInput({
             onClick={handleClear}
             disabled={!text || disabled}
             colorPalette="gray"
+            borderRadius="md"
           >
             Clear
           </Button>
@@ -96,6 +97,7 @@ export function TextTranslationInput({
             loading={isTranslating}
             colorPalette="blue"
             fontWeight="semibold"
+            borderRadius="md"
           >
             {isTranslating ? 'Translating...' : 'Translate'}
           </Button>

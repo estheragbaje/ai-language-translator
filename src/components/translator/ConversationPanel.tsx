@@ -57,6 +57,7 @@ export function ConversationPanel({
               variant="ghost"
               colorPalette="red"
               onClick={onClear}
+              borderRadius="md"
             >
               Clear
             </Button>

@@ -57,6 +57,7 @@ export function HistoryPanel({
             variant="ghost"
             colorPalette="red"
             onClick={onClear}
+            borderRadius="md"
           >
             Clear All
           </Button>
@@ -124,8 +125,9 @@ export function HistoryPanel({
                     colorPalette="red"
                     onClick={() => onDelete(entry.id)}
                     aria-label="Delete"
+                    borderRadius="md"
                   >
-                    🗑️
+                    ×
                   </IconButton>
                 </HStack>
 
@@ -148,8 +150,9 @@ export function HistoryPanel({
                   colorPalette="blue"
                   onClick={() => onReplay(entry)}
                   w="fit-content"
+                  borderRadius="md"
                 >
-                  ↻ Replay
+                  Replay
                 </Button>
               </VStack>
             </Box>

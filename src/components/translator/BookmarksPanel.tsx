@@ -96,6 +96,7 @@ export function BookmarksPanel({
           variant="outline"
           colorPalette="blue"
           onClick={() => setShowAddForm(true)}
+          borderRadius="md"
         >
           + Add Current Translation
         </Button>
@@ -140,10 +141,11 @@ export function BookmarksPanel({
                   setCategory('');
                   setNote('');
                 }}
+                borderRadius="md"
               >
                 Cancel
               </Button>
-              <Button size="sm" colorPalette="blue" onClick={handleAddBookmark}>
+              <Button size="sm" colorPalette="blue" onClick={handleAddBookmark} borderRadius="md">
                 Save
               </Button>
             </HStack>
@@ -224,8 +226,9 @@ export function BookmarksPanel({
                           colorPalette="red"
                           onClick={() => onDelete(bookmark.id)}
                           aria-label="Delete"
+                          borderRadius="md"
                         >
-                          🗑️
+                          ×
                         </IconButton>
                       </HStack>
 
@@ -248,7 +251,7 @@ export function BookmarksPanel({
                             mt={1}
                             fontStyle="italic"
                           >
-                            💡 {bookmark.note}
+                            {bookmark.note}
                           </Text>
                         )}
                       </Box>
@@ -259,8 +262,9 @@ export function BookmarksPanel({
                         colorPalette="blue"
                         onClick={() => onUse(bookmark)}
                         w="fit-content"
+                        borderRadius="md"
                       >
-                        ↻ Use This
+                        Use This
                       </Button>
                     </VStack>
                   </Box>

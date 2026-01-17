@@ -507,10 +507,11 @@ export default function Home() {
                 variant={isConversationMode ? 'solid' : 'outline'}
                 colorPalette={isConversationMode ? 'green' : 'gray'}
                 onClick={toggleConversationMode}
+                borderRadius="md"
               >
                 {isConversationMode
-                  ? '💬 Conversation Mode Active'
-                  : '💬 Enable Conversation Mode'}
+                  ? 'Conversation Mode Active'
+                  : 'Enable Conversation Mode'}
               </Button>
             </HStack>
           </VStack>
@@ -556,7 +557,7 @@ export default function Home() {
                       shadow: 'sm',
                     }}
                   >
-                    🎤 Voice
+                    Voice
                   </Tabs.Trigger>
                   <Tabs.Trigger
                     value="text"
