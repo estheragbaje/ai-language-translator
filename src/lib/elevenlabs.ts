@@ -10,6 +10,7 @@ export const elevenlabs = new ElevenLabsClient({
 
 // Voice ID mapping for each language
 export const VOICE_IDS: Record<string, string> = {
+  en: process.env.ELEVENLABS_VOICE_ID_EN || 'EXAVITQu4vr4xnSDxMaL', // Default English voice
   fr: process.env.ELEVENLABS_VOICE_ID_FR || 'Xb7hH8MSUJpSbSDYk0k2', // Default French voice
   es: process.env.ELEVENLABS_VOICE_ID_ES || 'GBv7mTt0atIp3Br8iCZE', // Default Spanish voice
   yo: process.env.ELEVENLABS_VOICE_ID_YO || 'pNInz6obpgDQGcFmaJgB', // Default Yoruba voice

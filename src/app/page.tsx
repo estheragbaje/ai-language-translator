@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Box,
   Button,
@@ -9,6 +9,7 @@ import {
   GridItem,
   Heading,
   HStack,
+  IconButton,
   Tabs,
   Text,
   VStack,
@@ -18,9 +19,15 @@ import { LanguageSelector } from '@/components/translator/LanguageSelector';
 import { RecordButton } from '@/components/translator/RecordButton';
 import { TranscriptPanel } from '@/components/translator/TranscriptPanel';
 import { TextTranslationInput } from '@/components/translator/TextTranslationInput';
-import { AudioPlayer } from '@/components/translator/AudioPlayer';
+import { ConversationPanel } from '@/components/translator/ConversationPanel';
+import { TranslatorSidebar } from '@/components/translator/TranslatorSidebar';
 import { useAudioRecorder } from '@/hooks/useAudioRecorder';
 import { ALL_LANGUAGES, LANGUAGE_OPTIONS } from '@/lib/constants';
+import {
+  HistoryEntry,
+  ConversationMessage,
+  BookmarkEntry,
+} from '@/types/translator';
 
 export default function Home() {
   const [sourceLanguage, setSourceLanguage] = useState<string[]>(['en']);
@@ -29,6 +36,173 @@ export default function Home() {
   const [translatedText, setTranslatedText] = useState('');
   const [isTranslating, setIsTranslating] = useState(false);
   const [audioUrl, setAudioUrl] = useState<string | null>(null);
+  const [history, setHistory] = useState<HistoryEntry[]>([]);
+  const [isConversationMode, setIsConversationMode] = useState(false);
+  const [conversationMessages, setConversationMessages] = useState<
+    ConversationMessage[]
+  >([]);
+  const [currentSpeaker, setCurrentSpeaker] = useState<'A' | 'B'>('A');
+  const [bookmarks, setBookmarks] = useState<BookmarkEntry[]>([]);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+
+  // Load history from localStorage on mount
+  useEffect(() => {
+    const savedHistory = localStorage.getItem('translationHistory');
+    if (savedHistory) {
+      try {
+        setHistory(JSON.parse(savedHistory));
+      } catch (error) {
+        console.error('Failed to load history:', error);
+      }
+    }
+
+    const savedBookmarks = localStorage.getItem('translationBookmarks');
+    if (savedBookmarks) {
+      try {
+        setBookmarks(JSON.parse(savedBookmarks));
+      } catch (error) {
+        console.error('Failed to load bookmarks:', error);
+      }
+    }
+  }, []);
+
+  // Save history to localStorage whenever it changes
+  useEffect(() => {
+    if (history.length > 0) {
+      localStorage.setItem('translationHistory', JSON.stringify(history));
+    }
+  }, [history]);
+
+  // Save bookmarks to localStorage whenever they change
+  useEffect(() => {
+    localStorage.setItem('translationBookmarks', JSON.stringify(bookmarks));
+  }, [bookmarks]);
+
+  const addToHistory = (
+    sourceText: string,
+    translatedText: string,
+    sourceLang: string,
+    targetLang: string,
+  ) => {
+    const newEntry: HistoryEntry = {
+      id: Date.now().toString(),
+      sourceText,
+      translatedText,
+      sourceLanguage: sourceLang,
+      targetLanguage: targetLang,
+      timestamp: Date.now(),
+    };
+    setHistory((prev) => [newEntry, ...prev].slice(0, 50)); // Keep last 50 entries
+  };
+
+  const clearHistory = () => {
+    setHistory([]);
+    localStorage.removeItem('translationHistory');
+    toaster.success({
+      title: 'History cleared',
+      description: 'All translation history has been removed',
+    });
+  };
+
+  const deleteHistoryEntry = (id: string) => {
+    setHistory((prev) => prev.filter((entry) => entry.id !== id));
+  };
+
+  const replayHistoryEntry = async (entry: HistoryEntry) => {
+    setSourceLanguage([entry.sourceLanguage]);
+    setTargetLanguage([entry.targetLanguage]);
+    setSourceText(entry.sourceText);
+    await handleTranslateText(entry.sourceText);
+  };
+
+  const toggleConversationMode = () => {
+    setIsConversationMode(!isConversationMode);
+    if (!isConversationMode) {
+      // Entering conversation mode
+      setCurrentSpeaker('A');
+      toaster.info({
+        title: 'Conversation Mode Active',
+        description: 'Languages will auto-swap between speakers',
+      });
+    } else {
+      // Exiting conversation mode
+      toaster.info({
+        title: 'Conversation Mode Disabled',
+        description: 'Switched back to standard translation',
+      });
+    }
+  };
+
+  const clearConversation = () => {
+    setConversationMessages([]);
+    setCurrentSpeaker('A');
+    toaster.success({
+      title: 'Conversation cleared',
+    });
+  };
+
+  const addConversationMessage = (
+    text: string,
+    translation: string,
+    speaker: 'A' | 'B',
+  ) => {
+    const newMessage: ConversationMessage = {
+      id: Date.now().toString(),
+      speaker,
+      text,
+      translation,
+      language: speaker === 'A' ? sourceLanguage[0] : targetLanguage[0],
+      timestamp: Date.now(),
+    };
+    setConversationMessages((prev) => [...prev, newMessage]);
+    // Toggle speaker for next turn
+    setCurrentSpeaker(speaker === 'A' ? 'B' : 'A');
+  };
+
+  const addBookmark = (bookmark: Omit<BookmarkEntry, 'id' | 'timestamp'>) => {
+    const newBookmark: BookmarkEntry = {
+      ...bookmark,
+      id: Date.now().toString(),
+      timestamp: Date.now(),
+    };
+    setBookmarks((prev) => [newBookmark, ...prev]);
+    toaster.success({
+      title: 'Bookmark saved',
+      description: 'Translation added to bookmarks',
+    });
+  };
+
+  const deleteBookmark = (id: string) => {
+    setBookmarks((prev) => prev.filter((bookmark) => bookmark.id !== id));
+    toaster.success({
+      title: 'Bookmark deleted',
+    });
+  };
+
+  const useBookmark = async (bookmark: BookmarkEntry) => {
+    setSourceLanguage([bookmark.sourceLanguage]);
+    setTargetLanguage([bookmark.targetLanguage]);
+    setSourceText(bookmark.sourceText);
+    setTranslatedText(bookmark.translatedText);
+    await generateAudio(bookmark.translatedText);
+  };
+
+  const handleQuickBookmark = () => {
+    if (!sourceText || !translatedText) {
+      toaster.error({
+        title: 'Cannot bookmark',
+        description: 'No translation available to bookmark',
+      });
+      return;
+    }
+
+    addBookmark({
+      sourceText,
+      translatedText,
+      sourceLanguage: sourceLanguage[0],
+      targetLanguage: targetLanguage[0],
+    });
+  };
 
   const { state, duration, startRecording, stopRecording, reset } =
     useAudioRecorder({
@@ -56,6 +230,11 @@ export default function Home() {
     // Clear translations when swapping
     setSourceText('');
     setTranslatedText('');
+
+    // In conversation mode, also swap the current speaker
+    if (isConversationMode) {
+      setCurrentSpeaker(currentSpeaker === 'A' ? 'B' : 'A');
+    }
   };
 
   const getAvailableTargetLanguages = () => {
@@ -76,7 +255,7 @@ export default function Home() {
         {
           method: 'POST',
           body: audioBlob,
-        }
+        },
       );
 
       console.log('📡 STT Response status:', sttResponse.status);
@@ -137,8 +316,21 @@ export default function Home() {
       const { translated, latencyMs } = await translationResponse.json();
       setTranslatedText(translated);
 
-      // Generate audio for the translation
-      await generateAudio(translated);
+      // Generate audio for the translation BEFORE any mode-specific logic
+      // Pass the current target language explicitly to avoid race conditions
+      await generateAudio(translated, targetLanguage[0]);
+
+      // In conversation mode, add to conversation
+      if (isConversationMode) {
+        addConversationMessage(text, translated, currentSpeaker);
+        // Auto-swap languages for next speaker
+        setTimeout(() => {
+          swapLanguages();
+        }, 100);
+      } else {
+        // Add to history in normal mode
+        addToHistory(text, translated, sourceLanguage[0], targetLanguage[0]);
+      }
 
       toaster.success({
         title: 'Translation complete',
@@ -157,14 +349,17 @@ export default function Home() {
     }
   };
 
-  const generateAudio = async (text: string) => {
+  const generateAudio = async (text: string, language?: string) => {
     try {
+      const audioLanguage = language || targetLanguage[0];
+      console.log('🔊 Generating audio for language:', audioLanguage);
+      
       const ttsResponse = await fetch('/api/tts/stream', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           text,
-          language: targetLanguage[0],
+          language: audioLanguage,
         }),
       });
 
@@ -176,11 +371,28 @@ export default function Home() {
       const url = URL.createObjectURL(audioBlob);
       setAudioUrl(url);
 
-      // Auto-play the audio
+      // Auto-play the audio with better error handling
+      console.log('▶️ Playing audio...');
       const audio = new Audio(url);
-      audio.play().catch((error) => {
-        console.error('Auto-play failed:', error);
-        // Auto-play might be blocked by browser, that's okay
+      
+      // Wait for audio to load before playing
+      await new Promise((resolve, reject) => {
+        audio.onloadeddata = () => {
+          audio.play()
+            .then(() => {
+              console.log('✅ Audio playing successfully');
+              resolve(true);
+            })
+            .catch((error) => {
+              console.error('❌ Auto-play failed:', error);
+              toaster.info({
+                title: 'Audio ready',
+                description: 'Click play to hear the translation',
+              });
+              resolve(false);
+            });
+        };
+        audio.onerror = reject;
       });
     } catch (error) {
       console.error('TTS error:', error);
@@ -227,7 +439,28 @@ export default function Home() {
   const selectedLang = ALL_LANGUAGES[targetLanguage[0]] || ALL_LANGUAGES.fr;
 
   return (
-    <Box minH="100vh" bg="gray.50" _dark={{ bg: 'gray.900' }}>
+    <Box
+      minH="100vh"
+      bg="gray.50"
+      _dark={{ bg: 'gray.900' }}
+      position="relative"
+    >
+      {/* Sidebar Toggle Button - Top Right */}
+      <IconButton
+        position="fixed"
+        top={4}
+        right={4}
+        size="lg"
+        variant="solid"
+        colorPalette="blue"
+        onClick={() => setIsSidebarOpen(true)}
+        aria-label="Open history and bookmarks"
+        zIndex={10}
+        shadow="md"
+      >
+        ☰
+      </IconButton>
+
       <Container maxW="6xl" py={{ base: 6, md: 10 }}>
         <VStack gap={{ base: 6, md: 8 }} align="stretch">
           {/* Header */}
@@ -265,6 +498,20 @@ export default function Home() {
             >
               Speak naturally and get instant translations in multiple languages
             </Text>
+
+            {/* Action Buttons */}
+            <HStack gap={3} mt={2} flexWrap="wrap" justify="center">
+              <Button
+                size="md"
+                variant={isConversationMode ? 'solid' : 'outline'}
+                colorPalette={isConversationMode ? 'green' : 'gray'}
+                onClick={toggleConversationMode}
+              >
+                {isConversationMode
+                  ? '💬 Conversation Mode Active'
+                  : '💬 Enable Conversation Mode'}
+              </Button>
+            </HStack>
           </VStack>
 
           {/* Input Method Tabs with Language Selection */}
@@ -428,8 +675,8 @@ export default function Home() {
                     {state === 'recording'
                       ? '🎙️ Recording... Speak clearly into your microphone'
                       : state === 'processing'
-                      ? '⚙️ Processing your recording...'
-                      : '\u00A0'}
+                        ? '⚙️ Processing your recording...'
+                        : '\u00A0'}
                   </Text>
                 </VStack>
               </Tabs.Content>
@@ -476,13 +723,25 @@ export default function Home() {
                 isLoading={isTranslating}
                 showCopy={true}
                 showPlay={true}
+                showBookmark={true}
                 onCopy={() => handleCopyText(translatedText)}
                 onPlay={handlePlayAudio}
+                onBookmark={handleQuickBookmark}
                 audioUrl={audioUrl}
                 colorPalette="green"
               />
             </GridItem>
           </Grid>
+
+          {/* Conversation Panel */}
+          {isConversationMode && (
+            <ConversationPanel
+              messages={conversationMessages}
+              onClear={clearConversation}
+              personALanguage={sourceLanguage[0]}
+              personBLanguage={targetLanguage[0]}
+            />
+          )}
 
           {/* Footer */}
           <Box pt={{ base: 12, md: 16 }}>
@@ -498,6 +757,23 @@ export default function Home() {
           </Box>
         </VStack>
       </Container>
+
+      <TranslatorSidebar
+        isOpen={isSidebarOpen}
+        onClose={() => setIsSidebarOpen(false)}
+        history={history}
+        bookmarks={bookmarks}
+        onClearHistory={clearHistory}
+        onReplayHistory={replayHistoryEntry}
+        onDeleteHistory={deleteHistoryEntry}
+        onAddBookmark={addBookmark}
+        onDeleteBookmark={deleteBookmark}
+        onUseBookmark={useBookmark}
+        currentSource={sourceText}
+        currentTranslation={translatedText}
+        sourceLanguage={sourceLanguage[0]}
+        targetLanguage={targetLanguage[0]}
+      />
 
       <Toaster />
     </Box>

@@ -1,7 +1,7 @@
 // Language types
-export type SourceLanguage = 'en';
-export type TargetLanguage = 'fr' | 'es' | 'yo' | 'rw';
-export type Language = SourceLanguage | TargetLanguage;
+export type Language = 'en' | 'fr' | 'es' | 'yo' | 'rw';
+export type SourceLanguage = Language;
+export type TargetLanguage = Language;
 
 // Language info
 export interface LanguageInfo {
@@ -50,4 +50,36 @@ export interface TranscriptEntry {
   targetLanguage: TargetLanguage;
   timestamp: number;
   audioUrl?: string;
+}
+
+// History entry
+export interface HistoryEntry {
+  id: string;
+  sourceText: string;
+  translatedText: string;
+  sourceLanguage: string;
+  targetLanguage: string;
+  timestamp: number;
+}
+
+// Bookmark entry
+export interface BookmarkEntry {
+  id: string;
+  sourceText: string;
+  translatedText: string;
+  sourceLanguage: string;
+  targetLanguage: string;
+  category?: string;
+  note?: string;
+  timestamp: number;
+}
+
+// Conversation message
+export interface ConversationMessage {
+  id: string;
+  speaker: 'A' | 'B';
+  text: string;
+  translation: string;
+  language: string;
+  timestamp: number;
 }

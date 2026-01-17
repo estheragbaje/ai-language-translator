@@ -11,15 +11,20 @@ export const openai = new OpenAI({
 export async function translateText(
   text: string,
   targetLanguage: string,
-  style: 'formal' | 'informal' = 'formal'
+  style: 'formal' | 'informal' = 'formal',
+  sourceLanguage?: string,
 ): Promise<string> {
   const languageNames: Record<string, string> = {
+    en: 'English',
     fr: 'French',
     es: 'Spanish',
     yo: 'Yoruba',
     rw: 'Kinyarwanda',
   };
 
+  const sourceLangName = sourceLanguage
+    ? languageNames[sourceLanguage] || sourceLanguage
+    : 'the source language';
   const targetLangName = languageNames[targetLanguage] || targetLanguage;
   const styleGuide =
     style === 'formal'
@@ -31,7 +36,7 @@ export async function translateText(
     messages: [
       {
         role: 'system',
-        content: `You are a professional translator. Translate the given English text to ${targetLangName}. 
+        content: `You are a professional translator. Translate the given text from ${sourceLangName} to ${targetLangName}. 
 Use a ${styleGuide} tone. Maintain the original meaning and context. 
 Return ONLY the translated text, without any explanations or additional commentary.`,
       },
@@ -52,10 +57,22 @@ export async function speechToText(
     language?: string;
     prompt?: string;
     temperature?: number;
-  } = {}
+  } = {},
 ): Promise<string> {
   try {
     const { language = 'en', prompt, temperature = 0 } = options;
+
+    // Map language codes - Whisper supports a limited set of languages
+    // For languages Whisper doesn't support well, we'll use language detection (undefined)
+    const whisperLanguageMap: Record<string, string | undefined> = {
+      en: 'en',
+      fr: 'fr',
+      es: 'es',
+      yo: undefined, // Yoruba not well-supported, use auto-detect
+      rw: undefined, // Kinyarwanda not well-supported, use auto-detect
+    };
+
+    const whisperLanguage = whisperLanguageMap[language] || language;
 
     // Detect audio format from buffer signature
     const audioFormat = detectAudioFormat(audioBuffer);
@@ -66,7 +83,7 @@ export async function speechToText(
       `audio.${audioFormat}`,
       {
         type: getMimeType(audioFormat),
-      }
+      },
     );
 
     // Validate file size (max 25MB for Whisper)
@@ -79,7 +96,7 @@ export async function speechToText(
     const transcription = await openai.audio.transcriptions.create({
       file: audioFile,
       model: 'whisper-1',
-      language, // ISO-639-1 language code
+      ...(whisperLanguage ? { language: whisperLanguage } : {}), // Only set language if supported
       prompt, // Optional context to improve accuracy
       temperature, // 0-1, controls randomness
       response_format: 'json', // or 'text', 'srt', 'verbose_json', 'vtt'
@@ -93,7 +110,7 @@ export async function speechToText(
       // Provide more specific error messages
       if (error.message.includes('Invalid file format')) {
         throw new Error(
-          'Unsupported audio format. Please use mp3, mp4, mpeg, mpga, m4a, wav, or webm'
+          'Unsupported audio format. Please use mp3, mp4, mpeg, mpga, m4a, wav, or webm',
         );
       }
       if (error.message.includes('rate limit')) {

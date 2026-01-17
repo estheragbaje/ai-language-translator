@@ -19,8 +19,10 @@ interface TranscriptPanelProps {
   isLoading?: boolean;
   showCopy?: boolean;
   showPlay?: boolean;
+  showBookmark?: boolean;
   onCopy?: () => void;
   onPlay?: () => void;
+  onBookmark?: () => void;
   audioUrl?: string | null;
   colorPalette?: 'blue' | 'green' | 'purple';
 }
@@ -33,8 +35,10 @@ export function TranscriptPanel({
   isLoading = false,
   showCopy = true,
   showPlay = false,
+  showBookmark = false,
   onCopy,
   onPlay,
+  onBookmark,
   audioUrl,
   colorPalette = 'blue',
 }: TranscriptPanelProps) {
@@ -120,6 +124,17 @@ export function TranscriptPanel({
                 colorPalette={colorPalette}
               >
                 ▶️ Play
+              </Button>
+            )}
+            {showBookmark && onBookmark && text && (
+              <Button
+                size="sm"
+                variant="ghost"
+                onClick={onBookmark}
+                colorPalette="yellow"
+                title="Bookmark this translation"
+              >
+                ⭐ Bookmark
               </Button>
             )}
             {showCopy && onCopy && text && (
