@@ -353,7 +353,7 @@ export default function Home() {
     try {
       const audioLanguage = language || targetLanguage[0];
       console.log('🔊 Generating audio for language:', audioLanguage);
-      
+
       const ttsResponse = await fetch('/api/tts/stream', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -374,11 +374,12 @@ export default function Home() {
       // Auto-play the audio with better error handling
       console.log('▶️ Playing audio...');
       const audio = new Audio(url);
-      
+
       // Wait for audio to load before playing
       await new Promise((resolve, reject) => {
         audio.onloadeddata = () => {
-          audio.play()
+          audio
+            .play()
             .then(() => {
               console.log('✅ Audio playing successfully');
               resolve(true);

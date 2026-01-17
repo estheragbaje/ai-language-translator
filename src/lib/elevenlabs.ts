@@ -19,7 +19,7 @@ export const VOICE_IDS: Record<string, string> = {
 
 export async function textToSpeech(
   text: string,
-  languageCode: string
+  languageCode: string,
 ): Promise<Buffer> {
   const voiceId = VOICE_IDS[languageCode];
 
@@ -50,6 +50,6 @@ export async function speechToText(_audioBuffer: Buffer): Promise<string> {
   // ElevenLabs STT API is not well-documented in the SDK
   // Using OpenAI Whisper is recommended for STT
   throw new Error(
-    'Please use OpenAI Whisper for speech-to-text. Import from @/lib/openai instead.'
+    'Please use OpenAI Whisper for speech-to-text. Import from @/lib/openai instead.',
   );
 }
