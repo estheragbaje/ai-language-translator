@@ -42,6 +42,7 @@ export const TARGET_LANGUAGES: Record<TargetLanguage, LanguageInfo> = {
   es: ALL_LANGUAGES.es,
   yo: ALL_LANGUAGES.yo,
   rw: ALL_LANGUAGES.rw,
+  en: ALL_LANGUAGES.en,
 };
 export const TARGET_LANGUAGE_OPTIONS = Object.values(TARGET_LANGUAGES);
 
